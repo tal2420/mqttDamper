@@ -11,14 +11,21 @@ extern "C" {
 const int stepsPerRevolution = 200;  // change this to fit the number of steps per revolution
 // of your motor
 
-// initialize the stepper library on pins 8 through 11:
+// initialize the stepper library on connected pins:
 Stepper myStepper(stepsPerRevolution, 15, 12, 13, 14);
 
-// Update these with values suitable for your network.
-
-//const char* ssid = "ssid";
-//const char* password = "pass";
-//const char* mqtt_server = "192.168.1.123";
+// Update these with values suitable for you, comment this block if you want to put them in the config.h file (recommended)
+/* 
+const char ssid[]  = "ssid";
+const char password[]  = "pass";
+const char mqtt_server[]  = "192.168.1.123";
+const int mqtt_port = 1883;
+const char mqttClientId[]  = "3D_Damper";
+const char inTopic[] = "inTopic";
+const char outTopic[] = "outTopic";
+const int ledPin = 13;
+const int openDamperSteps = -600; 
+*/
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -71,9 +78,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println();
 
-  // Switch on the LED if an 1 was received as first character
   if ((char)payload[0] == '1') {
-    //openDamper();
+    //openDamper
     if (damperState<2) //not in motion  or already open
     {
       damperState = 4;
@@ -86,7 +92,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     
   }
   else if ((char)payload[0] == '2') {
-    //closeDamper();
+    //closeDamper
     if (damperState<3) //not in motion
     {
       damperState = 3;
@@ -96,14 +102,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
       client.publish(outTopic, "error: damper status=" + damperState);
     }
   } else {
-    //digitalWrite(0, HIGH);  // Turn the LED off by making the voltage HIGH
     client.publish(outTopic, "error: unrecognized action");
   }
 
 }
-
-
-
 
 void reconnect() {
   // Loop until we're reconnected
@@ -142,13 +144,12 @@ void setup() {
   // initialize the serial port:
   Serial.begin(115200);
 
-  pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
-  pinMode(led_red_pin, OUTPUT); // LED
+  pinMode(BUILTIN_LED, OUTPUT); // Initialize the BUILTIN_LED pin as an output
+  pinMode(led_red_pin, OUTPUT); 
   pinMode(led_green_pin, OUTPUT);
   pinMode(led_blue_pin, OUTPUT);
   pinMode(limiter_pin,INPUT_PULLUP);
   pinMode(toggle_btn_pin,INPUT_PULLUP);
-  //digitalWrite(limiter_pin, HIGH);
   
   setup_wifi();
   client.setServer(mqtt_server, mqtt_port);
@@ -200,8 +201,8 @@ void loop() {
   }
   client.loop();
 
+  
   //Main logic
-
 
   if (damperState == 0) //close Damper on init
   {
@@ -231,7 +232,7 @@ void loop() {
   
   if (damperState == 4) //opening Damper
   {
-    digitalWrite(led_red_pin, LOW);   // Turn the LED on (Note that LOW is the voltage level
+    digitalWrite(led_red_pin, LOW);
     digitalWrite(led_green_pin, HIGH);
     Serial.println("open_damper");
     snprintf (msg, 50, "open_damper", value);
@@ -246,8 +247,6 @@ void loop() {
     digitalWrite(led_blue_pin, HIGH);
   } 
   
-  
-
   //Watchdog
   long now = millis();
   if (now - lastMsg > 10000) {
@@ -268,7 +267,7 @@ void loop() {
   
     int status;
     status = digitalRead(limiter_pin);
-    //Serial.println(status);
+
     if (status == 0)
     {
       digitalWrite(led_blue_pin, LOW);
@@ -315,9 +314,6 @@ void loop() {
     }
   }
   
-  
-  
-
 }
 
 
