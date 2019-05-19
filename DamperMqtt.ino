@@ -1,3 +1,6 @@
+extern "C" {
+#include "user_interface.h"
+}
 #include <Stepper.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -39,7 +42,9 @@ void setup_wifi() {
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
-
+  wifi_station_set_hostname("3dDamper");
+  Serial.print("Host Name: ");
+  Serial.println(WiFi.hostname());
   //WiFi.setSleepMode(WIFI_NONE_SLEEP); 
   WiFi.begin(ssid, password);
 
@@ -188,7 +193,7 @@ void setup() {
 }
 
 void loop() {
-  //ArduinoOTA.handle();
+  ArduinoOTA.handle();
 
   if (!client.connected()) {
   reconnect();
