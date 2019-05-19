@@ -38,7 +38,7 @@ int damperState = 0; //0-stop, 1-closed, 2-open, 3-closing, 4-opening
 void setup_wifi() {
 
   delay(10);
-  // We start by connecting to a WiFi network  
+  // We start by connecting to a WiFi network
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
